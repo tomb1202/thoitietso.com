@@ -83,4 +83,11 @@ Route::get('/storage/uploads/advs/{path?}', function ($path) {
 
 // 
 Route::get('/', [TestController::class, 'index'])->name('index');
-Route::get('/temp', [TestController::class, 'temp'])->name('temp');
+Route::get('/weather', [TestController::class, 'weather'])->name('weather');
+Route::get('/topic', [TestController::class, 'topic'])->name('topic');
+Route::get('/post', [TestController::class, 'post'])->name('post');
+
+Route::get('/rss', [TestController::class, 'rss'])->name('rss');
+Route::get('/introduce', [TestController::class, 'introduce'])->name('introduce');
+Route::get('/policy', [TestController::class, 'policy'])->name('policy');
+Route::get('/contact', [TestController::class, 'contact'])->name('contact');

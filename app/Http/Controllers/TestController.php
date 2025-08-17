@@ -8,29 +8,44 @@ use Jenssegers\Agent\Agent;
 
 class TestController extends Controller
 {
-
     public function index()
     {
-        return view('site.master');
+        return view('site.home');
     }
 
-    public function temp()
+    public function weather()
     {
-        return view('site.temp');
+        return view('site.pages.weather');
     }
 
-    public function genre()
+    public function topic()
     {
-        return view('site.pages.genre');
+        return view('site.pages.topic');
     }
 
-    public function search()
+    public function post()
     {
-        return view('site.pages.search');
+        return view('site.pages.post');
     }
 
-    public function view()
+    public function rss()
     {
-        return view('site.view');
+        return view('site.policies.rss');
     }
+
+    public function introduce()
+    {
+        return view('site.policies.introduce');
+    }
+
+    public function contact()
+    {
+        return view('site.policies.contact');
+    }
+
+    public function policy()
+    {
+        return view('site.policies.policy');
+    }
+
 }
