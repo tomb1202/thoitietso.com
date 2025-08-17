@@ -9,15 +9,14 @@ use Jenssegers\Agent\Agent;
 class TestController extends Controller
 {
 
-    public function home()
+    public function index()
     {
-        $agent  = new Agent();
-        
-        if ($agent->isDesktop()) {
-            return view('site.home');
-        } else {
-            return view('site.mobile.home');
-        }
+        return view('site.master');
+    }
+
+    public function temp()
+    {
+        return view('site.temp');
     }
 
     public function genre()

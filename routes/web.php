@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Cache;
 
@@ -79,3 +80,7 @@ Route::get('/storage/uploads/advs/{path?}', function ($path) {
     return $response;
 })->name('web.adv.banner');
 
+
+// 
+Route::get('/', [TestController::class, 'index'])->name('index');
+Route::get('/temp', [TestController::class, 'temp'])->name('temp');
