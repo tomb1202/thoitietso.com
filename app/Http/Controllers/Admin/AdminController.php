@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\StoreAdminRequest;
-use App\Models\Movie;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -24,11 +23,7 @@ class AdminController extends Controller
     public function index()
     {
         $today = Carbon::now();
-
-        return view('admin.dashboard.index', [
-            'totalMovies'       => Movie::count(),
-            'totalNewMovies'    => Movie::whereDate('created_at', $today)->count(),
-        ]);
+        return view('admin.dashboard.index');
     }
     public function accounts()
     {
