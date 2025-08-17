@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Icon / Search</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="search" transform="translate(1.260000, 1.391304)" stroke="#FFFFFF" stroke-width="1.53043478">
+            <circle id="Oval" cx="7.43230544" cy="5.91304348" r="5.91304348"></circle>
+            <line x1="3.25839239" y1="10.0869565" x2="0" y2="13.3453489" id="Line" stroke-linecap="square"></line>
+        </g>
+    </g>
+</svg>

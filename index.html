@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test HLS m3u8 Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Plyr CSS (optional UI) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3/dist/plyr.css" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+    }
+
+    .video-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 15px;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="video-container">
+    <video id="player" controls playsinline></video>
+  </div>
+
+  <!-- hls.js -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <!-- Plyr (optional, for nice UI) -->
+  <script src="https://cdn.jsdelivr.net/npm/plyr@3"></script>
+
+  <script>
+    const video = document.getElementById('player');
+    const videoSrc = "https://play.cloudbeta.win/file/play/168c28d3-c8ad-4c50-823a-41c5a4db7505.m3u8";
+
+    // HLS.js support check
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        xhrSetup: function(xhr) {
+          // Gán đầy đủ headers từ curl
+          xhr.setRequestHeader('Origin', 'https://viupload.net');
+          xhr.setRequestHeader('Referer', 'https://viupload.net/');
+          xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36');
+        }
+      });
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        video.play();
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Native support for Safari
+      video.src = videoSrc;
+      video.addEventListener('loadedmetadata', function () {
+        video.play();
+      });
+    }
+
+    // Optional: Plyr UI
+    const player = new Plyr('#player');
+  </script>
+</body>
+</html>
