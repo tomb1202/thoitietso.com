@@ -27,15 +27,12 @@ class Truncate extends Command
     public function handle()
     {
         $tables = [
-            'genres',
-            'movie_genres',
-            'movie_actors',
-            'movie_directors',
-            'movie_countries',
-            'movie_sources',
-            'movies',
-            'actors',
-            'directors'
+            'regions',
+            'provinces',
+            'districts',
+            'wards',
+            'weather',
+            'weather_airs'
         ];
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');

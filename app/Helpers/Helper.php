@@ -355,3 +355,137 @@ EOT;
     }
 }
 
+if (!function_exists('getRandomProxy')) {
+    function getRandomProxy(): string
+    {
+
+        $proxies = [
+            [
+                'proxy' => '103.183.119.19:8797:tombY60hf:Xb7oVoq9',
+                'change_ip_url' => 'https://api.zingproxy.com/getip/vn/884b8be51c56f7e7ee3405f88a3eaab29fa87412',
+            ],
+            [
+                'proxy' => '103.183.119.19:8949:tombxdeLQ:HIgusN9q',
+                'change_ip_url' => 'https://api.zingproxy.com/getip/vn/f093ef51d0421b4ef8884f21898eb31a62102fb0',
+            ],
+        ];
+
+
+        while (true) {
+            shuffle($proxies);
+
+            foreach ($proxies as $item) {
+                $raw = $item['proxy'];
+                $changeIpUrl = $item['change_ip_url'];
+
+                [$ip, $port, $user, $pass] = explode(':', $raw);
+                $formatted = "http://{$user}:{$pass}@{$ip}:{$port}";
+
+                try {
+                    $client = Symfony\Component\HttpClient\HttpClient::create([
+                        'proxy' => $formatted,
+                        'timeout' => 5,
+                        'verify_peer' => false,
+                        'verify_host' => false,
+                    ]);
+
+                    $res = $client->request('GET', 'https://httpbin.org/ip');
+
+                    if ($res->getStatusCode() === 200) {
+                        return $formatted;
+                    }
+                } catch (\Throwable $e) {
+                    if (!empty($changeIpUrl)) {
+                        try {
+                            \Illuminate\Support\Facades\Http::timeout(10)->get($changeIpUrl);
+                            sleep(3);
+
+                            // Thử lại proxy sau đổi IP
+                            try {
+                                $clientRetry = Symfony\Component\HttpClient\HttpClient::create([
+                                    'proxy' => $formatted,
+                                    'timeout' => 5,
+                                    'verify_peer' => false,
+                                    'verify_host' => false,
+                                ]);
+                                $resRetry = $clientRetry->request('GET', 'https://httpbin.org/ip');
+                                if ($resRetry->getStatusCode() === 200) {
+                                    return $formatted;
+                                }
+                            } catch (\Throwable $retryEx) {
+                                // Bỏ qua
+                            }
+                        } catch (\Throwable $ex) {
+                            // Bỏ qua
+                        }
+                    }
+                }
+            }
+
+            sleep(2);
+        }
+    }
+}
+
+if (!function_exists('rotateProxyIpByIp')) {
+    function rotateProxyIpByIp(string $ip): void
+    {
+        $map = [
+            '103.183.119.19' => [
+                'https://api.zingproxy.com/getip/vn/884b8be51c56f7e7ee3405f88a3eaab29fa87412',
+                'https://api.zingproxy.com/getip/vn/f093ef51d0421b4ef8884f21898eb31a62102fb0',
+            ],
+        ];
+
+        if (!isset($map[$ip])) {
+            Log::info("Không tìm thấy link đổi IP cho proxy $ip");
+            return;
+        }
+
+        foreach ($map[$ip] as $changeIpUrl) {
+            try {
+                Http::timeout(10)->get($changeIpUrl);
+                Log::info("Đã gọi đổi IP thành công cho proxy $ip - $changeIpUrl");
+                sleep(1); // đợi IP đổi
+            } catch (\Throwable $e) {
+                Log::warning("Gọi API đổi IP thất bại cho $ip", [
+                    'url' => $changeIpUrl,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+}
+
+if (!function_exists('geocodeProvinceLatLng')) {
+    function geocodeProvinceLatLng(string $provinceName): ?array
+    {
+        $url = 'https://nominatim.openstreetmap.org/search';
+
+        $response = Http::withHeaders([
+            'User-Agent' => 'WeatherCrawler/1.0 (contact@yourdomain.com)', // bắt buộc với OSM
+        ])->get($url, [
+            'q'      => $provinceName . ', Vietnam',
+            'format' => 'json',
+            'limit'  => 1,
+        ]);
+
+        if (!$response->successful()) {
+            Log::error('Nominatim API error', [
+                'province' => $provinceName,
+                'status'   => $response->status(),
+                'message'  => $response->body(),
+            ]);
+            return null;
+        }
+
+        $data = $response->json();
+        if (empty($data[0])) return null;
+
+        return [
+            'lat' => (float) $data[0]['lat'],
+            'lng' => (float) $data[0]['lon'],
+        ];
+    }
+}
+
