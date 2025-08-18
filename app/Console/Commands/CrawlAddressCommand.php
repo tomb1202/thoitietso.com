@@ -9,10 +9,11 @@ use Symfony\Component\HttpClient\HttpClient;
 use Goutte\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\CrawlDistrictsOfProvinceJob;
 
-class CrawlRegionsProvincesCommand extends Command
+class CrawlAddressCommand extends Command
 {
-    protected $signature = 'crawl:regions-provinces';
+    protected $signature = 'crawl:address';
     protected $description = 'Crawl regions and provinces from thoitiet.vn';
 
     public function handle()
@@ -74,11 +75,14 @@ class CrawlRegionsProvincesCommand extends Command
                             } else {
                                 Log::warning("Không lấy được tọa độ từ Nominatim cho: {$provinceName}");
                             }
+
+                            // Dispatch job để cào District
+                            dispatch(new CrawlDistrictsOfProvinceJob($province->id));
                         });
                     });
                 });
 
-                $this->info('Cào xong Region + Province');
+                $this->info('✅ Cào xong Region + Province (và đã dispatch Job cào District)');
                 return;
             } catch (\Throwable $e) {
                 $retryCount++;
@@ -91,11 +95,11 @@ class CrawlRegionsProvincesCommand extends Command
                     rotateProxyIpByIp($ip);
                 }
 
-                Log::error("Lỗi lần {$retryCount}: " . $e->getMessage());
+                Log::error("❌ Lỗi lần {$retryCount}: " . $e->getMessage());
                 sleep(1);
             }
         }
 
-        $this->error('Hết số lần retry, command failed.');
+        $this->error('⛔ Hết số lần retry, command failed.');
     }
 }

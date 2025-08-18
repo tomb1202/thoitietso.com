@@ -1,5 +1,5 @@
 apps:
-  - name: mesextv-queue-worker
+  - name: thoitiet-queue-worker
     script: artisan
     exec_mode: fork
     interpreter: php
