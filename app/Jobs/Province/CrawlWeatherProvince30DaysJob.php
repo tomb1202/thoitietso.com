@@ -1,28 +1,38 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Jobs\Province;
 
 use App\Models\Province;
 use App\Models\WeatherProvince;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Console\Command;
+use Goutte\Client;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Goutte\Client;
 use Symfony\Component\HttpClient\HttpClient;
 
-class TestCommand extends Command
+class CrawlWeatherProvince30DaysJob implements ShouldQueue
 {
-    protected $signature = 'test:run';
-    protected $description = 'Fetch 30-day weather (thoitiet.vn/30-ngay-toi) with proxy & retry.';
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function handle()
+    public int $provinceId;
+
+    public function __construct(int $provinceId)
+    {
+        $this->provinceId = $provinceId;
+    }
+
+    public function handle(): bool
     {
         try {
-            $province = Province::find(1);
+            $province = Province::find($this->provinceId);
             if (!$province || !$province->url) {
-                Log::warning('Skip 30d: province missing or no url', ['province_id' => 1]);
+                Log::warning('Skip 30d: province missing or no url', ['province_id' => $this->provinceId]);
                 return false;
             }
 
