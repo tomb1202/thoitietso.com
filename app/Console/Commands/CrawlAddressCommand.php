@@ -77,7 +77,7 @@ class CrawlAddressCommand extends Command
                             }
 
                             // Dispatch job để cào District
-                            dispatch(new CrawlDistrictsOfProvinceJob($province->id));
+                            dispatch(new CrawlDistrictsOfProvinceJob($province->id))->onQueue('district');
                         });
                     });
                 });

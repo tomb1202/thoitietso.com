@@ -20,21 +20,20 @@ class SettingSeeder extends Seeder
         $settings = [
             'logo'              => '',
             'favicon'           => '',
-            'title'             => 'XXVN – Xem Phim 18+ Online Miễn Phí | Cập Nhật Nhanh, Không Quảng Cáo',
-            'site_name'         => 'XXVN',
+            'title'             => 'Dự báo thời tiết hằng ngày – Nhanh chóng, Chính xác, Miễn phí',
+            'site_name'         => 'ThoiTiet24h',
             'version'           => '1.0',
-            'theme_color'       => '#111111',
+            'theme_color'       => '#0a74da',
             'google_analytics'  => '',
-            'mail'              => 'contact@xxvn.tv',
-            'description'       => 'XXVN là nền tảng xem phim 18+ trực tuyến miễn phí, tốc độ cao, chất lượng HD. Tổng hợp phim người lớn từ nhiều quốc gia, cập nhật liên tục.',
-            'introduce'         => 'XXVN cung cấp kho phim 18+ chất lượng cao từ các quốc gia như Nhật Bản, Hàn Quốc, Âu Mỹ, Việt Nam, v.v...
-        Website không yêu cầu đăng ký, không quảng cáo gây phiền phức.
-        Người dùng có thể xem online mượt mà hoặc tải về để xem offline bất kỳ lúc nào.',
-            'copyright'         => '© 2025 XXVN. All rights reserved.',
-            'notification'      => '⚠️ XXVN chỉ dành cho người trên 18 tuổi. Truy cập kho phim 18+ chất lượng cao, miễn phí, không quảng cáo!',
-            'introduct_footer'  => 'XXVN không lưu trữ bất kỳ video nào trên máy chủ. Tất cả nội dung đều được nhúng từ các nền tảng chia sẻ của bên thứ ba.',
+            'mail'              => 'contact@thoitiet24h.vn',
+            'description'       => 'Cập nhật dự báo thời tiết hằng ngày cho toàn quốc: nhiệt độ, mưa, gió, độ ẩm, chỉ số UV. Thông tin chính xác, nhanh chóng và miễn phí.',
+            'introduce'         => 'ThoiTiet24h cung cấp thông tin dự báo thời tiết chi tiết cho từng tỉnh thành trên cả nước.
+        Người dùng có thể xem dự báo theo giờ, 5 ngày, 30 ngày.
+        Dữ liệu được cập nhật liên tục, đảm bảo độ chính xác và tin cậy.',
+            'copyright'         => '© 2025 ThoiTiet24h. All rights reserved.',
+            'notification'      => 'ℹ️ Dự báo thời tiết hằng ngày – Nhanh chóng, chính xác, miễn phí cho mọi khu vực trên toàn quốc!',
+            'introduct_footer'  => 'ThoiTiet24h chỉ cung cấp thông tin dự báo. Chúng tôi không chịu trách nhiệm về thiệt hại do sử dụng dữ liệu không chính xác hoặc thay đổi đột xuất từ thiên nhiên.',
         ];
-
 
         foreach ($settings as $key => $setting) {
             Setting::create([

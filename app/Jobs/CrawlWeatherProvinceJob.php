@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\WeatherProvince;
 use Carbon\Carbon;
-use Goutte\Client; // dùng symfony/goutte
+use Goutte\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

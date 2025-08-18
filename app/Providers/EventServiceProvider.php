@@ -2,11 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\MakeAdvsEvent;
-use App\Listeners\GenerateDesktopAdxJsFileListener;
-use App\Listeners\GenerateHeaderAdxListener;
-use App\Listeners\GenerateMobileAdxJsFileListener;
-use App\Listeners\GenerateUnderPlayerAdxListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -22,12 +17,6 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        MakeAdvsEvent::class => [
-            GenerateHeaderAdxListener::class,
-            GenerateDesktopAdxJsFileListener::class,
-            GenerateMobileAdxJsFileListener::class,
-            GenerateUnderPlayerAdxListener::class,
-        ]
     ];
 
     /**

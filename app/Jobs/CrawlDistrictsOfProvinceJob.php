@@ -67,7 +67,7 @@ class CrawlDistrictsOfProvinceJob implements ShouldQueue
                     ]
                 );
 
-                dispatch(new CrawlWardsOfDistrictJob($district->id));
+                dispatch(new CrawlWardsOfDistrictJob($district->id))->onQueue('ward');
             });
 
             Log::info("Crawled districts for province: {$province->name}");
