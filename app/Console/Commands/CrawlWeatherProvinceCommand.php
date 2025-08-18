@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\Province\CrawlWeatherProvinceJob;
 use Illuminate\Console\Command;
-use App\Jobs\CrawlWeatherProvinceJob;
 use App\Models\Province;
 
 class CrawlWeatherProvinceCommand extends Command
