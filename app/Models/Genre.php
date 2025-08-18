@@ -5,15 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class District extends Model
+class Genre extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'province_id',
         'name',
-        'code',
-        'latitude',
-        'longitude',
+        'slug',
+        'description',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'hidden',
     ];
 }

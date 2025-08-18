@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('topic_id')->nullable()->comment('ID thể loại');
+            $table->unsignedBigInteger('genre_id')->nullable()->comment('ID thể loại');
             $table->string('title')->comment('Tiêu đề bài viết');
             $table->string('slug')->unique()->comment('Slug URL');
             $table->text('excerpt')->nullable()->comment('Tóm tắt nội dung');

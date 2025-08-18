@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Region extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'code',
+    ];
+
+    public function provinces()
+    {
+        return $this->hasMany(Province::class);
+    }
 }

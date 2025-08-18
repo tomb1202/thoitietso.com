@@ -6,17 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('weather', function (Blueprint $table) {
             $table->bigIncrements('id');
+
             $table->unsignedBigInteger('province_id')->comment('ID tỉnh/thành');
             $table->unsignedBigInteger('district_id')->comment('ID quận/huyện');
 
-            $table->dateTime('forecast_time')->index()->comment('Thời điểm dự báo');
+            $table->dateTime('forecast_time')->comment('Thời điểm dự báo');
 
             $table->float('temp_min')->nullable()->comment('Nhiệt độ thấp nhất');
             $table->float('temp_max')->nullable()->comment('Nhiệt độ cao nhất');
@@ -32,14 +30,20 @@ return new class extends Migration
             $table->string('icon')->nullable()->comment('Biểu tượng thời tiết');
 
             $table->timestamps();
+
+            // Indexes
+            $table->index(['province_id']);
+            $table->index(['district_id']);
+            $table->index(['province_id', 'district_id']);
+            $table->index(['forecast_time']);
+
+            $table->foreign('province_id')->references('id')->on('provinces')->cascadeOnDelete();
+            $table->foreign('district_id')->references('id')->on('districts')->cascadeOnDelete();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('weather_hourlies');
+        Schema::dropIfExists('weather');
     }
 };
