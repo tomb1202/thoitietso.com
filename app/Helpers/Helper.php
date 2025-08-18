@@ -463,7 +463,7 @@ if (!function_exists('geocodeProvinceLatLng')) {
         $url = 'https://nominatim.openstreetmap.org/search';
 
         $response = Http::withHeaders([
-            'User-Agent' => 'WeatherCrawler/1.0 (contact@yourdomain.com)', // bắt buộc với OSM
+            'User-Agent' => 'WeatherCrawler/1.0 (contact@yourdomain.com)',
         ])->get($url, [
             'q'      => $provinceName . ', Vietnam',
             'format' => 'json',
@@ -488,4 +488,3 @@ if (!function_exists('geocodeProvinceLatLng')) {
         ];
     }
 }
-
