@@ -15,5 +15,6 @@ class District extends Model
         'code',
         'latitude',
         'longitude',
+        'url'
     ];
 }

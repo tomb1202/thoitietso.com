@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('districts', function (Blueprint $table) {
+        Schema::create('wards', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('province_id')->nullable()->comment('ID tỉnh/thành');
-            $table->string('name')->nullable()->comment('Tên quận/huyện');
+            $table->unsignedBigInteger('district_id')->nullable()->comment('ID tỉnh/thành');
+            $table->string('name')->comment('Tên quận/huyện');
             $table->string('code')->nullable()->comment('Mã quận/huyện');
             $table->decimal('latitude', 10, 7)->nullable()->comment('Vĩ độ');   // VD: 21.027764
             $table->decimal('longitude', 10, 7)->nullable()->comment('Kinh độ'); // VD: 105.834160
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('districts');
+        Schema::dropIfExists('wards');
     }
 };

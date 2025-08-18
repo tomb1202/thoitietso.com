@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Province extends Model
+class Ward extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'region_id',
+     protected $fillable = [
+        'district_id',
         'name',
         'code',
         'latitude',
