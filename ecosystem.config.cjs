@@ -1,23 +1,23 @@
 module.exports = {
   apps: [
     {
-      name: 'queue-district',
+      name: 'district',
       script: 'artisan',
-      args: 'queue:work --queue=districts --sleep=1 --timeout=300 --tries=3',
+      args: 'queue:work --queue=district --sleep=1 --timeout=300 --tries=3',
       interpreter: 'php',
-      instances: 1,
+      instances: 3,
       watch: false,
     },
     {
-      name: 'queue-ward',
+      name: 'ward',
       script: 'artisan',
-      args: 'queue:work --queue=wards --sleep=1 --timeout=300 --tries=3',
+      args: 'queue:work --queue=ward --sleep=1 --timeout=300 --tries=3',
       interpreter: 'php',
-      instances: 2,
+      instances: 3,
       watch: false,
     },
     {
-      name: 'queue-weather',
+      name: 'weather',
       script: 'artisan',
       args: 'queue:work --queue=weather --sleep=1 --timeout=300 --tries=3',
       interpreter: 'php',

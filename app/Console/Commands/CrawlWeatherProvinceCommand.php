@@ -17,7 +17,7 @@ class CrawlWeatherProvinceCommand extends Command
         $provinces = Province::all();
 
         foreach ($provinces as $province) {
-            CrawlWeatherProvinceJob::dispatch($province->id, $province->slug)
+            CrawlWeatherProvinceJob::dispatch($province)
                 ->onQueue('weather');
             $this->info("Đã dispatch job cho {$province->name}");
         }
