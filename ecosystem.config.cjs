@@ -23,6 +23,14 @@ module.exports = {
       interpreter: 'php',
       instances: 4,
       watch: false,
+    },
+    {
+      name: 'air',
+      script: 'artisan',
+      args: 'queue:work --queue=air --sleep=1 --timeout=300 --tries=3',
+      interpreter: 'php',
+      instances: 2,
+      watch: false,
     }
   ]
 };

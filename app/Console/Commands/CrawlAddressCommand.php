@@ -33,7 +33,7 @@ class CrawlAddressCommand extends Command
                     'headers'      => [
                         'User-Agent' => 'Mozilla/5.0',
                         'Accept'     => 'text/html',
-                        'Referer'    => 'https://truyenfull.vision/',
+                        'Referer'    => 'https://thoitiet.vn/',
                     ],
                 ]);
 
@@ -82,7 +82,7 @@ class CrawlAddressCommand extends Command
                     });
                 });
 
-                $this->info('✅ Cào xong Region + Province (và đã dispatch Job cào District)');
+                $this->info('Cào xong Region + Province (và đã dispatch Job cào District)');
                 return;
             } catch (\Throwable $e) {
                 $retryCount++;
@@ -95,11 +95,11 @@ class CrawlAddressCommand extends Command
                     rotateProxyIpByIp($ip);
                 }
 
-                Log::error("❌ Lỗi lần {$retryCount}: " . $e->getMessage());
+                Log::error("Lỗi lần {$retryCount}: " . $e->getMessage());
                 sleep(1);
             }
         }
 
-        $this->error('⛔ Hết số lần retry, command failed.');
+        $this->error('Hết số lần retry, command failed.');
     }
 }

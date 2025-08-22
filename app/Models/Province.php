@@ -17,4 +17,9 @@ class Province extends Model
         'longitude',
         'url'
     ];
+
+    public function districts()
+    {
+        return $this->hasMany(District::class);
+    }
 }

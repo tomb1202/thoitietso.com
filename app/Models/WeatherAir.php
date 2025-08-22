@@ -12,6 +12,7 @@ class WeatherAir extends Model
     protected $fillable = [
         'province_id',
         'district_id',
+        'ward_id',
         'time',
         'aqi',
         'pm10',
@@ -20,6 +21,8 @@ class WeatherAir extends Model
         'no2',
         'o3',
         'co',
-        'category',
+        'nh3',
+        'no',
+        'category', 
     ];
 }

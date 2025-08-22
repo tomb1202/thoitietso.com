@@ -17,4 +17,9 @@ class District extends Model
         'longitude',
         'url'
     ];
+
+    public function wards()
+    {
+        return $this->hasMany(Ward::class);
+    }
 }
