@@ -2,73 +2,47 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\Air\CrawlAirTargetJob;
+use App\Jobs\CrawlAirJob;
 use App\Models\Province;
-use Carbon\Carbon;
-use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 
 class TestCommand extends Command
 {
     protected $signature = 'test:run';
-    protected $description = 'Fetch 30-day weather (thoitiet.vn/30-ngay-toi) with proxy & retry.';
+    protected $description = 'Test crawl chất lượng không khí cho 1 province (id = 1) và các cấp con';
 
     public function handle()
     {
-        try {
-            $province = Province::with(['districts.wards'])->find(1);
-            
-            if (!$province || !$province->url) {
-                Log::warning('Skip air dispatch: province missing or no url', ['province_id' => 1]);
-                return;
-            }
+        $province = Province::with(['districts.wards'])->find(1);
 
-            $timeIso = Carbon::now()->startOfHour()->toIso8601String();
-            $jobs = [];
-
-            // province
-            $jobs[] = (new CrawlAirTargetJob(
-                url: $province->url,
-                provinceId: $province->id,
-                districtId: null,
-                wardId: null,
-                timeIso: $timeIso
-            ))->onQueue('air');
-
-            // districts & wards
-            foreach ($province->districts as $d) {
-                if ($d->url) {
-                    $jobs[] = (new CrawlAirTargetJob(
-                        url: $d->url,
-                        provinceId: $province->id,
-                        districtId: $d->id,
-                        wardId: null,
-                        timeIso: $timeIso
-                    ))->onQueue('air');
-                }
-                foreach ($d->wards as $w) {
-                    if ($w->url) {
-                        $jobs[] = (new CrawlAirTargetJob(
-                            url: $w->url,
-                            provinceId: $province->id,
-                            districtId: $d->id,
-                            wardId: $w->id,
-                            timeIso: $timeIso
-                        ))->onQueue('air');
-                    }
-                }
-            }
-
-            // batch để chạy song song (quan sát được tiến độ)
-            Bus::batch($jobs)
-                ->name("air:province:{$province->id}")
-                ->allowFailures()
-                ->onQueue('air')
-                ->dispatch();
-        } catch (Exception $e) {
-            dd($e);
+        if (!$province || !$province->url) {
+            Log::warning('Skip test: province missing or no url', ['province_id' => 1]);
+            $this->error("Province không tồn tại hoặc chưa có URL.");
+            return self::FAILURE;
         }
+
+        // Crawl cấp tỉnh
+        dispatch((new CrawlAirJob($province->id))->onQueue('air'));
+        $this->info("✅ Dispatched: Province - {$province->name}");
+
+        // Crawl cấp quận (nếu có URL)
+        foreach ($province->districts as $district) {
+            if ($district->url) {
+                dispatch((new CrawlAirJob($province->id, $district->id))->onQueue('district'));
+                $this->info("✅ Dispatched: District - {$district->name}");
+            }
+            // Crawl cấp phường (nếu có URL)
+            foreach ($district->wards as $ward) {
+                if ($ward->url) {
+                    dispatch((new CrawlAirJob($province->id, $district->id, $ward->id))->onQueue('ward'));
+                    $this->info("✅ Dispatched: Ward - {$ward->name}");
+                }
+            }
+        }
+
+        $this->info("🎉 Đã dispatch xong toàn bộ job crawl không khí cho tỉnh: {$province->name}");
+
+        return self::SUCCESS;
     }
 }

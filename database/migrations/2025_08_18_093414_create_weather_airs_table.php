@@ -29,6 +29,7 @@ return new class extends Migration
             $table->float('pm10')->nullable()->comment('Nồng độ PM10');
             $table->float('co')->nullable()->comment('Nồng độ CO');
             $table->float('o3')->nullable()->comment('Nồng độ O3');
+            $table->string('level')->nullable();
 
             // Thêm index nếu chưa có
             $table->index(['province_id']);

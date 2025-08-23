@@ -23,6 +23,6 @@ class WeatherAir extends Model
         'co',
         'nh3',
         'no',
-        'category', 
+        'level', 
     ];
 }

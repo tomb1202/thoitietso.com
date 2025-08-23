@@ -3,9 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Models\Adv;
 use App\Models\Genre;
-use App\Models\SearchKeyword;
 use App\Models\Setting;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -42,49 +40,15 @@ class AppServiceProvider extends ServiceProvider
                 $agent  = new Agent();
                 $isDesktop = $agent->isDesktop() ? true : false;
 
-                $textLinks = Adv::where(['status' => 1])->where('type', 'LIKE', '%textlink%')->orderBy('sort', 'desc')->get();
-                $pushJs = Adv::where(['status' => 1])->where('type', 'LIKE', '%push-js%')->orderBy('sort', 'desc')->get();
-
-                $popupJs = Adv::where(['status' => 1])->where('type', 'LIKE', '%popup-js%')->orderBy('sort', 'desc')->get();
-                $headerScript = Adv::where(['status' => 1])->where('type', 'LIKE', '%header%')->orderBy('sort', 'desc')->get();
-
-                $bottomScript = Adv::where(['status' => 1])->where('type', 'LIKE', '%bottom%')->orderBy('sort', 'desc')->get();
-
-                $bannerTopScript = Adv::where(['status' => 1])->where('type', 'LIKE', '%banner-script%')->where('position', 'LIKE', '%top%')->orderBy('sort', 'desc')->get();
-                $bannerCenterScript = Adv::where(['status' => 1])->where('type', 'LIKE', '%banner-script%')->where('position', 'LIKE', '%center%')->orderBy('sort', 'desc')->get();
-
-                $genres = Genre::where(['hidden' => 0, 'is_main' => 1])
+                $genres = Genre::where(['hidden' => 0])
                     ->where('slug', '!=', '')
-                    ->whereHas('movies', function ($q) {
-                        $q->where('hidden', 0);
-                    })
-                    ->orderBy('sort', 'asc')
                     ->get();
-
-                $topSearches = SearchKeyword::orderByDesc('count')
-                    ->limit(50)
-                    ->get();
-
 
                 View::share('genres', $genres);
 
                 View::share('settings', $arrSettings);
                 View::share('version', $version);
                 View::share('isDesktop', $isDesktop);
-
-                View::share('textLinks', $textLinks);
-
-                View::share('pushJs', $pushJs);
-                View::share('popupJs', $popupJs);
-
-                View::share('headerScript', $headerScript);
-                View::share('bottomScript', $bottomScript);
-
-                View::share('bannerTopScript', $bannerTopScript);
-                View::share('bannerCenterScript', $bannerCenterScript);
-
-                View::share('topSearches', $topSearches);
-
             }
         } catch (Exception $e) {
             Log::error('Errr', ['err' => $e]);

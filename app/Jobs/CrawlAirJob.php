@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Jobs\Air;
+namespace App\Jobs;
 
+use App\Models\Province;
 use App\Models\WeatherAir;
 use Carbon\Carbon;
+use Goutte\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,33 +13,56 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Goutte\Client;
-use Illuminate\Bus\Batchable;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\DomCrawler\Crawler;
 
-class CrawlAirTargetJob implements ShouldQueue
+class CrawlAirJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    // cấu hình retry của queue (khác retry HTTP bên trong)
-    public $tries = 2;
+    public $tries   = 2;
     public $backoff = 5;
 
     public function __construct(
-        protected string $url,
         protected int $provinceId,
-        protected ?int $districtId,
-        protected ?int $wardId,
-        protected string $timeIso // truyền time ở dispatcher để dedup
+        protected ?int $districtId = null,
+        protected ?int $wardId = null
     ) {}
 
     public function handle(): void
     {
-        $time = Carbon::parse($this->timeIso);
+        $province = Province::with(['districts.wards'])->find($this->provinceId);
+        if (!$province) {
+            Log::warning('Skip air dispatch: province missing', ['province_id' => $this->provinceId]);
+            return;
+        }
 
-        $maxRetries = 5;
-        $retry      = 0;
+        // Determine URL theo cấp
+        $url = null;
+        if ($this->wardId) {
+            $url = $province->districts
+                ->flatMap->wards
+                ->firstWhere('id', $this->wardId)?->url;
+        } elseif ($this->districtId) {
+            $url = $province->districts
+                ->firstWhere('id', $this->districtId)?->url;
+        } else {
+            $url = $province->url;
+        }
+
+        if (!$url) {
+            Log::warning('Skip air dispatch: missing URL for location', [
+                'province_id' => $this->provinceId,
+                'district_id' => $this->districtId,
+                'ward_id'     => $this->wardId,
+            ]);
+            return;
+        }
+
+        $time = Carbon::now()->startOfHour();
+
+        $maxRetries = 2;
+        $retry = 0;
 
         while ($retry < $maxRetries) {
             $proxy = function_exists('getRandomProxy') ? getRandomProxy() : null;
@@ -57,33 +82,22 @@ class CrawlAirTargetJob implements ShouldQueue
                 ]);
 
                 $client  = new Client($httpClient);
-                $crawler = $client->request('GET', $this->url);
+                $crawler = $client->request('GET', $url);
 
                 // helpers
-                $getText = function (Crawler $node, string $selector, ?string $default = null) {
-                    try {
-                        if ($node->filter($selector)->count() > 0) {
-                            return trim($node->filter($selector)->text());
-                        }
-                    } catch (\Throwable $e) {}
-                    return $default;
-                };
-                $toFloat = function (?string $val): ?float {
-                    if ($val === null) return null;
-                    $num = filter_var($val, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-                    return is_numeric($num) ? (float)$num : null;
-                };
-                $normLabel = function (string $label): string {
-                    $label = strip_tags($label);
-                    $label = preg_replace('/\s+/', '', strtoupper($label)); // CO,NH3,NO,NO2,O3,PM10,PM25,SO2
-                    return $label ?? '';
-                };
+                $getText = fn(Crawler $node, string $selector, ?string $default = null)
+                    => $node->filter($selector)->count() ? trim($node->filter($selector)->text()) : $default;
 
-                // category
+                $toFloat = fn(?string $val)
+                    => is_numeric($num = filter_var($val, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION)) ? (float)$num : null;
+
+                $normLabel = fn(string $label)
+                    => preg_replace('/\s+/', '', strtoupper(strip_tags($label)));
+
                 $categoryFull = $getText($crawler, '.air-title', null);
-                $category     = $categoryFull ? trim(preg_replace('/^.*?:\s*/u', '', $categoryFull)) : null;
+                $level     = $categoryFull ? trim(preg_replace('/^.*?:\s*/u', '', $categoryFull)) : null;
 
-                $aqi = null; // chưa thấy số AQI trong HTML mẫu
+                $aqi = null;
 
                 $fields = [
                     'CO'   => 'co',
@@ -102,7 +116,7 @@ class CrawlAirTargetJob implements ShouldQueue
                     'ward_id'     => $this->wardId,
                     'time'        => $time,
                     'aqi'         => $aqi,
-                    'category'    => $category,
+                    'level'       => $level,
                 ];
 
                 if ($crawler->filter('.air-components .flex-1')->count() > 0) {
@@ -127,19 +141,10 @@ class CrawlAirTargetJob implements ShouldQueue
                     $data
                 );
 
-                Log::info('Air OK', [
-                    'url'         => $this->url,
-                    'province_id' => $this->provinceId,
-                    'district_id' => $this->districtId,
-                    'ward_id'     => $this->wardId,
-                    'proxy'       => $proxy,
-                ]);
-
                 return;
             } catch (\Throwable $e) {
                 $retry++;
 
-                // mark dead proxy & rotate
                 $ip = 'unknown';
                 if (preg_match('/@([\d\.]+):/', (string)$proxy, $m)) $ip = $m[1];
                 elseif (preg_match('/^https?:\/\/([\d\.]+):/', (string)$proxy, $m2)) $ip = $m2[1];
@@ -147,8 +152,9 @@ class CrawlAirTargetJob implements ShouldQueue
                 if ($ip !== 'unknown') {
                     Cache::put("proxy_dead_$ip", true, 120);
                     if (function_exists('rotateProxyIpByIp')) {
-                        try { rotateProxyIpByIp($ip); }
-                        catch (\Throwable $eRotate) {
+                        try {
+                            rotateProxyIpByIp($ip);
+                        } catch (\Throwable $eRotate) {
                             Log::warning('rotateProxyIpByIp failed', ['ip' => $ip, 'message' => $eRotate->getMessage()]);
                         }
                     }
@@ -156,7 +162,7 @@ class CrawlAirTargetJob implements ShouldQueue
 
                 if ($retry >= $maxRetries) {
                     Log::error('Air FAILED', [
-                        'url'         => $this->url,
+                        'url'         => $url,
                         'province_id' => $this->provinceId,
                         'district_id' => $this->districtId,
                         'ward_id'     => $this->wardId,
@@ -168,7 +174,7 @@ class CrawlAirTargetJob implements ShouldQueue
                 }
 
                 Log::warning('Air RETRY', [
-                    'url'         => $this->url,
+                    'url'         => $url,
                     'province_id' => $this->provinceId,
                     'district_id' => $this->districtId,
                     'ward_id'     => $this->wardId,

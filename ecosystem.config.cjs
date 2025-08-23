@@ -1,6 +1,14 @@
 module.exports = {
   apps: [
     {
+      name: 'default',
+      script: 'artisan',
+      args: 'queue:work --queue=default --sleep=1 --timeout=300 --tries=3',
+      interpreter: 'php',
+      instances: 3,
+      watch: false,
+    },
+    {
       name: 'district',
       script: 'artisan',
       args: 'queue:work --queue=district --sleep=1 --timeout=300 --tries=3',
