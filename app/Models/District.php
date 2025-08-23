@@ -18,6 +18,12 @@ class District extends Model
         'url'
     ];
 
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+
     public function wards()
     {
         return $this->hasMany(Ward::class);

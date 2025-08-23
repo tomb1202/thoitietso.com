@@ -31,6 +31,8 @@ class Truncate extends Command
             'weather_provinces',
             'weather_districts',
             'weather_wards',
+            'jobs',
+            'failed_jobs'
         ];
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');

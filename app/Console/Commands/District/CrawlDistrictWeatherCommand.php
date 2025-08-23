@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Console\Commands\Province;
+namespace App\Console\Commands\District;
 
 use App\Jobs\District\CrawlWeatherDistrictJob;
 use App\Models\District;
 use Illuminate\Console\Command;
-use App\Models\Province;
 
 class CrawlDistrictWeatherCommand extends Command
 {
-    protected $signature = 'crawl:d-weather-province';
+    protected $signature = 'crawl:weather-district';
 
     protected $description = 'Crawl weather data for all provinces (theo giờ)';
 

@@ -8,7 +8,7 @@ use App\Models\Province;
 
 class CrawlProvinceWeatherCommand extends Command
 {
-    protected $signature = 'crawl:p-weather-province';
+    protected $signature = 'crawl:weather-province';
 
     protected $description = 'Crawl weather data for all provinces (theo giờ)';
 

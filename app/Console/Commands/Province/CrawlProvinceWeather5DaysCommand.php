@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class CrawlProvinceWeather5DaysCommand extends Command
 {
-    protected $signature = 'weather:p-crawl-5d';
+    protected $signature = 'crawl:weather-province-5d';
     protected $description = 'Queue crawl 5-ngay-toi cho tất cả provinces (chỉ lưu từ ngày t+2).';
 
     public function handle()

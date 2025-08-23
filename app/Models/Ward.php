@@ -9,7 +9,7 @@ class Ward extends Model
 {
     use HasFactory;
 
-     protected $fillable = [
+    protected $fillable = [
         'district_id',
         'name',
         'code',
@@ -17,4 +17,14 @@ class Ward extends Model
         'longitude',
         'url'
     ];
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
+
+    public function province()
+    {
+        return $this->hasOneThrough(Province::class, District::class, 'id', 'id', 'district_id', 'province_id');
+    }
 }

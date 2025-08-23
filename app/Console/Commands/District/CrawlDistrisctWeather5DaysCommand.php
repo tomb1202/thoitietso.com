@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Console\Commands\Province;
+namespace App\Console\Commands\District;
 
 use App\Jobs\District\CrawlWeatherDistrict5DaysJob;
-use App\Models\Province;
+use App\Models\District;
 use Illuminate\Console\Command;
 
 class CrawlDistrisctWeather5DaysCommand extends Command
 {
-    protected $signature = 'weather:d-crawl-5d';
+    protected $signature = 'crawl:weather-district-5d';
     protected $description = 'Queue crawl 5-ngay-toi cho tất cả district (chỉ lưu từ ngày t+2).';
 
     public function handle()
     {
-        $districts = Province::whereNotNull('url')->orderBy('id')->get();
+        $districts = District::whereNotNull('url')->orderBy('id')->get();
 
         if ($districts->isEmpty()) {
             $this->warn('Không có district nào để queue.');
