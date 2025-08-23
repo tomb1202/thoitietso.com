@@ -27,12 +27,10 @@ class Truncate extends Command
     public function handle()
     {
         $tables = [
-            'regions',
-            'provinces',
-            'districts',
-            'wards',
-            'weather',
-            'weather_airs'
+            'weather_airs',
+            'weather_provinces',
+            'weather_districts',
+            'weather_wards',
         ];
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');

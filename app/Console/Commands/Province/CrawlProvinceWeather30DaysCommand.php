@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class CrawlProvinceWeather30DaysCommand extends Command
 {
-    protected $signature   = 'weather:crawl-30d';
+    protected $signature   = 'weather:p-crawl-30d';
     protected $description = 'Queue crawl 30-ngay-toi cho TẤT CẢ provinces (chỉ lưu từ ngày t+4).';
 
     public function handle()
@@ -24,7 +24,7 @@ class CrawlProvinceWeather30DaysCommand extends Command
         $this->output->progressStart($provinces->count());
 
         foreach ($provinces as $province) {
-            dispatch((new CrawlWeatherProvince30DaysJob($province->id))->onQueue('province'));
+            dispatch((new CrawlWeatherProvince30DaysJob($province->id))->onQueue('weather'));
             $this->output->progressAdvance();
         }
 
