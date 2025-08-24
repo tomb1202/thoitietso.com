@@ -47,6 +47,14 @@ module.exports = {
       interpreter: 'php',
       instances: 2,
       watch: false,
+    },
+    {
+      name: 'news',
+      script: 'artisan',
+      args: 'queue:work --queue=news --sleep=1 --timeout=300 --tries=3',
+      interpreter: 'php',
+      instances: 2,
+      watch: false,
     }
   ]
 };

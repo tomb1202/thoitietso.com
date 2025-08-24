@@ -22,5 +22,8 @@ class Article extends Model
         'highlight',
         'hidden',
         'published_at',
+        'url',
+        'copyright',
+        'copy_at'
     ];
 }
